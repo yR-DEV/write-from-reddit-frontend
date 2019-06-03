@@ -31,3 +31,38 @@
     transform: rotate(360deg);
   }
 }
+
+.dropdown-nav {
+  float: left;
+  padding-top: 30px;
+  padding-left: 50px;
+}
+
+/* .response-container {
+  padding-top: 50px;
+} */
+
+.response-btn-container {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  padding-right: 100px;
+}
+
+.edit-res-btn {
+  width: 85px;
+}
+
+.response-text {
+  padding-top: 20px;
+  padding-left: 20px;
+}
+
+.nav-icon {
+  font-size: 900px;
+}
+
+.drp-btn {
+  font-size: 40px;
+  height: 50px;
+  width: 50px;
+}

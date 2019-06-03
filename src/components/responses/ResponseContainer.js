@@ -13,8 +13,13 @@ const ResponseContainer = (props) => {
     })
 
     return (
-        <div className="container">
-            {responses}
+        <div className="container response-container">
+            <div className="row">
+                <h2>R E S P A W N Z E</h2>
+            </div>
+            <div className="row">
+                {responses}
+            </div>
         </div>
     )
 }

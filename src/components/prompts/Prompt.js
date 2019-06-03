@@ -2,12 +2,15 @@ import React from 'react';
 
 const Prompt = (props) => {
 
+    // const changeToActive = () => {
+    //     props.setPrompt();
+    // }
 
     return (
         <div className="container">
-            <p id={props.prompt.id} onClick={props.setPrompt}>
+            <a  className="collection-item black-text" id={props.prompt.id} onClick={props.setPrompt}>
                 {props.prompt.fiction_prompt}
-            </p>
+            </a>
         </div>
     )
 }

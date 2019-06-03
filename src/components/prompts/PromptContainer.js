@@ -12,9 +12,14 @@ const PromptContainer = (props) => {
 
     return (
         <div className="container">
+            <h2>P R A W M P U H T S</h2>
             <br></br>
-            <button onClick={props.handleMorePrompts}>Get 4 more pls.</button>
+            <a className="red accent-2 waves-effect waves-light btn" onClick={props.handleMorePrompts}>'Get' 4 more... 'GET' IT?... SHUT UP IM FUNNY.</a>
+            <br></br>
+            <br></br>
+            <div className="collection">
             {prompts}
+            </div>
         </div>
     )
 }

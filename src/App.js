@@ -1,6 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import { Redirect } from 'react-router-dom';
+// import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Redirect, withRouter } from "react-router-dom";
+import M from 'materialize-css';
 
 import PromptContainer from './components/prompts/PromptContainer';
 import ResponseContainer from './components/responses/ResponseContainer';
@@ -22,6 +23,7 @@ export default class App extends React.Component {
       selected_prompt: "",
       selected_prompt_id: 0,
       toggle_edit: false,
+      toggle_submit: false,
       edit_id: ""
     }
   }
@@ -34,6 +36,10 @@ export default class App extends React.Component {
     fetch(RESPONSE_API)
       .then(response => response.json())
       .then(writing_responses => this.setState({ writing_responses }))  
+
+    this.setState({ writing_response_draft: "", selected_prompt: "" })
+
+    M.AutoInit();
   }
 
   componentDidMount = () => {
@@ -48,12 +54,6 @@ export default class App extends React.Component {
     this.setState({ writing_response_draft: event.target.value })
   }
 
-  redirectAfterNewResponse = () => {
-    console.log('inside breh');
-    
-    return <Redirect to="/" />
-  }
-
   submitDraft = (event) => {
     event.preventDefault();
     fetch(RESPONSE_API, {
@@ -65,11 +65,10 @@ export default class App extends React.Component {
       body: JSON.stringify({
         fiction_response: this.state.writing_response_draft,
         writer_id: 1,
-        writing_prompt_id: 1
+        writing_prompt_id: this.state.selected_prompt_id
       })
     })
       .then(res => this.main())
-      this.redirectAfterNewResponse();
   }
 
   destroyResponse = (event) => {
@@ -77,7 +76,12 @@ export default class App extends React.Component {
       .then(response => this.main())
   } 
 
+  setPromptRedirect = () => {
+    console.log('inside of setPromptRedirect');
+  }
+
   setPrompt = (event) => {
+    this.setPromptRedirect();
     this.setState({ 
       selected_prompt: event.target.innerHTML, 
       selected_prompt_id: event.target.id
@@ -93,67 +97,52 @@ export default class App extends React.Component {
     const responseToEdit = this.state.writing_responses.filter(response =>  {
       return response.id.toString() === id
     })
+    const promptForEdit = this.state.writing_prompts.filter(prompt => {
+      return responseToEdit[0].writing_prompt_id === prompt.id
+    })
     this.setState({ writing_response_draft: responseToEdit[0].fiction_response,
                     edit_id: event.target.id,
+                    selected_prompt: promptForEdit[0].fiction_prompt
                   })
     this.toggleEditButton();
   }
 
-  // createEditBody = (editId) => {
-  //   return JSON.stringify({
-  //     fiction_response: this.state.writing_response_draft,
-  //     writer_id: 1,
-  //     writing_prompt_id: 
-  //   })
-  // }
-
-  submitEdit = (event) => {
-    console.log(event.target.id);
-    const patchBody = JSON.stringify({
+  createEditBody = (editId) => {
+    return JSON.stringify({
       fiction_response: this.state.writing_response_draft,
       writer_id: 1,
-      writing_prompt_id: event.target.id
+      writing_prompt_id: 1
     })
+  }
 
+  submitEdit = (event) => {
+    this.setState({ toggle_edit: false })
+    const editBody = this.createEditBody(event.target.id);
     fetch(`${RESPONSE_API}/${event.target.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json"
       },
-      body: patchBody
+      body: editBody
     })
     .then(response => this.main())
   }
-
-//   fetch(`${endPoint}/${habitEditId}`, {
-//     method: "PATCH",
-//     headers: {
-//         "Content-Type": "application/json",
-//         "Accept": "application/json"
-//     },
-//     body: JSON.stringify(patchBody)
-// }).then(response => console.log(response))
-// .then(res => {
-//     main();
-// })
 
   render() {
     return (
       <div className="App">
         <Router>
-
-          <nav>
-            <div className="nav-wrapper">
-              <a href="#" className="brand-logo">Logo</a>
-              <ul id="nav-mobile" className="right">
-                <li><Link to="/">Prompts</Link></li>
-                <li><Link to="/responses/">Responses</Link></li>
-                <li><Link to="/write/">Write</Link></li>
-              </ul>
-            </div>
-          </nav>
-
+          <div className="row dropdown-nav">
+          <a  class='dropdown-trigger btn red accent-2 drp-btn' href='#' onClick={this.handleDropDown} data-target='dropdown1'><i class="material-icons nav-icon">adjust</i></a>
+          </div>  
+            <ul id='dropdown1' class='dropdown-content'>
+              <li><Link class="red-text" to="/">Prompts</Link></li>
+              <li><Link class="red-text" to="/responses/">Responses</Link></li>
+              <li><Link class="red-text" to="/write/">Write</Link></li>
+              <li class="divider" tabindex="-1"></li> 
+              <li><Link class="red-text" to="#">Logout</Link></li>
+            </ul>
           <Route 
             exact path="/" render={(props) => (
               <PromptContainer 
@@ -164,7 +153,6 @@ export default class App extends React.Component {
               />
             )}
           />
-
           <Route 
             exact path="/responses/" render={(props) => (
               <ResponseContainer 
@@ -174,7 +162,6 @@ export default class App extends React.Component {
               />
             )}
           />
-
           <Route 
             exact path="/write/" render={(props) => (
               <Writing 
@@ -189,7 +176,6 @@ export default class App extends React.Component {
               />
             )}
           />
-
         </Router>
       </div>
     );
